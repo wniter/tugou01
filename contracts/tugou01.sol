@@ -13,9 +13,10 @@ import "./libraries/Clones.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 
 // import './libraries/SafeMath.sol';
+
 //入口
-//contract选择Blocktechnology合约进行部署，Value值200000000000000000（17个0，也就是0.2BNB）
-contract Blocktechnology is ERC20, Ownable {
+//contract选择tugou01合约进行部署，Value值200000000000000000（17个0，也就是0.2BNB）
+contract tugou01 is ERC20, Ownable {
     // import './libraries/SafeMath.sol';
     //引入SafeMath
     using SafeMath for uint256;
@@ -53,9 +54,13 @@ contract Blocktechnology is ERC20, Ownable {
 
     uint256 public gasForProcessing;
     
-    //事件
+ // 费用支出和最大交易金额
     mapping (address => bool) private _isExcludedFromFees;
 
+        
+     
+    // 自动做市商配对的门店地址。有没有转到这些地址
+    // 可能会受到最高转账金额的限制
     mapping (address => bool) public automatedMarketMakerPairs;
 
     event UpdateDividendTracker(address indexed newAddress, address indexed oldAddress);
@@ -92,6 +97,7 @@ contract Blocktechnology is ERC20, Ownable {
         address indexed processor
     );
     //constructor deployer 构造
+    //部署的时候因为这里是需要发送0.2bnb的手续费，所以我们需要在value的地方提前写入0.2+18个0，也就是2+18个0
     constructor(
         // 代币名称
         string memory name_,
@@ -99,12 +105,10 @@ contract Blocktechnology is ERC20, Ownable {
         string memory symbol_,
         // 发行量
         uint256 totalSupply_,
-        //分红代币的合约，注意一定是部署公链（币安链）上的
+        //分红代币的合约，注意一定是部署公链（币安链）上的，比如usdt的合约
         address rewardAddr_,
         //市场营销钱包，自己的
         address marketingWalletAddr_,
-        //bsc:0x7Ea95D639c59E5E0Dd4b7f4d62b5558933a84Fd9 （主网依赖合约）
-        address serviceAddr_,
         //[X,X,X,X] (X是数字，也就是百分比，分别对应分红、流动性、市场营销、燃烧，参考[1,1,1,2]) 这个4个加起来不能抄过25，
         uint256[4] memory buyFeeSetting_, 
         // [X,X,X,X] 同上
@@ -131,11 +135,13 @@ contract Blocktechnology is ERC20, Ownable {
         uint256 totalSupply = totalSupply_ * (10**18);
         swapTokensAtAmount = totalSupply.mul(2).div(10**6); // 0.002%
 
+        
+        //默认情况下，使用300000天然气处理自动索赔股息
         gasForProcessing = 300000;
+        
+        // dividendTracker = TokenDividendTracker(
 
-        dividendTracker = TokenDividendTracker(
-            payable(Clones.clone(serviceAddr_))
-        );
+        // );
         dividendTracker.initialize{value: msg.value}(rewardToken,tokenBalanceForReward_);
         /**
             bsc测试网相关参数：
@@ -172,13 +178,14 @@ contract Blocktechnology is ERC20, Ownable {
         uniswapV2Pair = _uniswapV2Pair;
 
         _setAutomatedMarketMakerPair(_uniswapV2Pair, true);
-
+         // 不接受股息
         dividendTracker.excludeFromDividends(address(dividendTracker));
         dividendTracker.excludeFromDividends(address(this));
         dividendTracker.excludeFromDividends(owner());
         dividendTracker.excludeFromDividends(deadWallet);
         dividendTracker.excludeFromDividends(address(_uniswapV2Router));
 
+        // 不包括支付费用或拥有最高交易金额
         excludeFromFees(owner(), true);
         excludeFromFees(_marketingWalletAddress, true);
         excludeFromFees(address(this), true);
@@ -186,6 +193,8 @@ contract Blocktechnology is ERC20, Ownable {
         _cast(owner(), totalSupply);
     }
 
+    // 一个合约只能有一个receive函数，该函数不能有参数和返回值，需设置为external，payable
+    // 当本合约收到ether但并未被调用任何函数，未接受任何数据，receive函数被触发
     receive() external payable {}
 
     function updateMinimumTokenBalanceForDividends(uint256 val) public onlyOwner {
@@ -215,11 +224,11 @@ contract Blocktechnology is ERC20, Ownable {
 
         emit ExcludeMultipleAccountsFromFees(accounts, excluded);
     }
-
+    // 设置营销钱包
     function setMarketingWallet(address payable wallet) external onlyOwner{
         _marketingWalletAddress = wallet;
     }
-
+ // 无法从automatedmarketmakerpairs中删除煎饼交换对
     function setAutomatedMarketMakerPair(address pair, bool value) public onlyOwner {
         require(pair != uniswapV2Pair, "Cannot delete pancake exchange pairs from automatedmarketmakerpairs");
         _setAutomatedMarketMakerPair(pair, value);
@@ -229,6 +238,7 @@ contract Blocktechnology is ERC20, Ownable {
         _isEnemy[account] = value;
     }
 
+    // 汽车做市商配对设置为该值
     function _setAutomatedMarketMakerPair(address pair, bool value) private {
         require(automatedMarketMakerPairs[pair] != value, "Auto market maker pairing is set to this value");
         automatedMarketMakerPairs[pair] = value;
@@ -238,7 +248,7 @@ contract Blocktechnology is ERC20, Ownable {
         }
         emit SetAutomatedMarketMakerPair(pair, value);
     }
-
+    // 更新预处理
     function updateGasForProcessing(uint256 newValue) public onlyOwner {
         require(newValue >= 200000 && newValue <= 500000, "Gas treatment must be between 200000 and 500000");
         require(newValue != gasForProcessing, "Cannot update gasforprocessing to the same value");
@@ -303,12 +313,12 @@ contract Blocktechnology is ERC20, Ownable {
             uint256) {
         return dividendTracker.getAccountAtIndex(index);
     }
-
+  // 进程红利跟踪器
     function processDividendTracker(uint256 gas) external {
         (uint256 iterations, uint256 claims, uint256 lastProcessedIndex) = dividendTracker.process(gas);
         emit ProcessedDividendTracker(iterations, claims, lastProcessedIndex, false, gas, tx.origin);
     }
-
+  // 宣称
     function claim() external {
         dividendTracker.processAccount(payable(msg.sender), false);
     }
@@ -396,7 +406,7 @@ contract Blocktechnology is ERC20, Ownable {
 
 
         bool takeFee = !swapping;
-
+            // 如果任何账户属于_isexcluded from fee account，则删除该费用
         if(_isExcludedFromFees[from] || _isExcludedFromFees[to]) {
             takeFee = false;
         }
@@ -456,23 +466,27 @@ contract Blocktechnology is ERC20, Ownable {
         IERC20(rewardToken).transfer(_marketingWalletAddress, newBalance);
         AmountMarketingFee = AmountMarketingFee - tokens;
     }
-
+    // 交换和液化
     function swapAndLiquify(uint256 tokens) private {
+          // 把合同余额分成两半
         uint256 half = tokens.div(2);
         uint256 otherHalf = tokens.sub(half);
 
         uint256 initialBalance = address(this).balance;
+        // 用代币换以太币
+        swapTokensForEth(half); // <-触发swap+liquify时，这会中断ETH->仇恨交换
 
-        swapTokensForEth(half);
-
+           // 我们刚刚换了多少钱
         uint256 newBalance = address(this).balance.sub(initialBalance);
 
+        // 为uniswap增加流动性
         addLiquidity(otherHalf, newBalance);
         AmountLiquidityFee = AmountLiquidityFee - tokens;
         emit SwapAndLiquify(half, newBalance, otherHalf);
     }
 
     function swapTokensForEth(uint256 tokenAmount) private {
+          // 生成令牌->weth的uniswap对路径
         address[] memory path = new address[](2);
         path[0] = address(this);
         path[1] = uniswapV2Router.WETH();

@@ -18,12 +18,20 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
     string private _name;
     string private _symbol;
-
+   /**
+     * @dev 设置 {name} 和 {symbol} 的值
+     *
+     *{decimals}的默认值是18。要为其选择其他值{decimals}你应该让它过载。
+     *
+     * 所有这两个值都是不可变的：在运行期间只能设置一次
+     */
     constructor(string memory name_, string memory symbol_) {
         _name = name_;
         _symbol = symbol_;
     }
-
+    /**
+     * @dev 返回令牌的名称
+     */
     function name() public view virtual override returns (string memory) {
         return _name;
     }

@@ -16,6 +16,8 @@ pragma solidity ^0.8.0;
  *
  * _Available since v3.4._
  */
+
+//参考https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/Clones.sol
 library Clones {
     /**
      * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.

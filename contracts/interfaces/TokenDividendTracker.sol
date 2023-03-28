@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.5.0;
 
-
+// 令牌分割跟踪器
 interface TokenDividendTracker {
     //初始化
     function initialize(address rewardToken_,uint256 minimumTokenBalanceForDividends_) external payable;

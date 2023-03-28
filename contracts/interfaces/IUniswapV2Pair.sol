@@ -1,5 +1,5 @@
 pragma solidity >=0.5.0;
-
+// Uniswap V2 配对、一对
 interface IUniswapV2Pair {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
