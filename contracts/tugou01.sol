@@ -53,8 +53,8 @@ contract tugou01 is ERC20, Ownable {
     mapping(address => bool) public _isEnemy;
 
     uint256 public gasForProcessing;
-    
- // 费用支出和最大交易金额
+
+    // 费用支出和最大交易金额
     mapping (address => bool) private _isExcludedFromFees;
 
         
@@ -105,7 +105,7 @@ contract tugou01 is ERC20, Ownable {
         string memory symbol_,
         // 发行量
         uint256 totalSupply_,
-        //分红代币的合约，注意一定是部署公链（币安链）上的，比如usdt的合约
+        //分红代币的合约，注意一定是部署公链（币安链）上的，比如usdt的合约，或者本合约
         address rewardAddr_,
         //市场营销钱包，自己的
         address marketingWalletAddr_,
@@ -128,7 +128,7 @@ contract tugou01 is ERC20, Ownable {
         sellLiquidityFee = sellFeeSetting_[1];
         sellMarketingFee = sellFeeSetting_[2];
         sellDeadFee = sellFeeSetting_[3];
-        //[X,X,X,X] 这个4个加起来不能抄过25
+        //[X,X,X,X] 这个4个加起来不能抄过25，这个地方可以改上限
         require(buyTokenRewardsFee.add(buyLiquidityFee).add(buyMarketingFee).add(buyDeadFee) <= 25, "Total purchase cost exceeds 25%");
         require(sellTokenRewardsFee.add(sellLiquidityFee).add(sellMarketingFee).add(sellDeadFee) <= 25, "Total sales expense exceeds 25%");
 
@@ -138,10 +138,8 @@ contract tugou01 is ERC20, Ownable {
         
         //默认情况下，使用300000天然气处理自动索赔股息
         gasForProcessing = 300000;
-        
-        // dividendTracker = TokenDividendTracker(
 
-        // );
+
         dividendTracker.initialize{value: msg.value}(rewardToken,tokenBalanceForReward_);
         /**
             bsc测试网相关参数：
