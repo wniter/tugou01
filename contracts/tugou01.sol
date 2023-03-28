@@ -106,11 +106,15 @@ contract tugou01 is ERC20, Ownable {
         // 发行量
         uint256 totalSupply_,
         //分红代币的合约，注意一定是部署公链（币安链）上的，比如usdt的合约，或者本合约
+        //0x75caa28db4341e392067f0ce27b9ede2dc7a31ab
         address rewardAddr_,
         //市场营销钱包，自己的
+        //0x5C8375CfFA8859e75d633cC31EaD5450c166e2A0
         address marketingWalletAddr_,
         //[X,X,X,X] (X是数字，也就是百分比，分别对应分红、流动性、市场营销、燃烧，参考[1,1,1,2]) 这个4个加起来不能抄过25，
+        //[1,1,1,2]
         uint256[4] memory buyFeeSetting_, 
+        //[4,3,2,1]
         // [X,X,X,X] 同上
         uint256[4] memory sellFeeSetting_,
         //持有多少代币参与分红，单位是wei，所以数量后要加18个0
@@ -138,9 +142,12 @@ contract tugou01 is ERC20, Ownable {
         
         //默认情况下，使用300000天然气处理自动索赔股息
         gasForProcessing = 300000;
-
-
+        //這個不知道怎麽改
+        // dividendTracker = TokenDividendTracker(
+        //     payable(Clones.clone(serviceAddr_))
+        // );
         dividendTracker.initialize{value: msg.value}(rewardToken,tokenBalanceForReward_);
+        //   dividendTracker = new TokenDividendTracker(rewardToken, tokenBalanceForReward_);
         /**
             bsc测试网相关参数：
                 薄饼测试网路由，源码676行:0xB6BA90af76D139AB3170c7df0139636dB6120F7e -》对应下面的地址。
@@ -169,6 +176,7 @@ contract tugou01 is ERC20, Ownable {
         */
        //UniswapV2路由合约的函数选择器和事件选择器
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xe2d05990fE091A1664D70D65Cb7B1eb651eF0724);
+        //  require(IERC20(rewardAddr_).totalSupply() > 0 && rewardAddr_ != _uniswapV2Router.WETH(), "Invalid Reward Token ");
         address _uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
             .createPair(address(this), _uniswapV2Router.WETH());
 

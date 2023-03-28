@@ -19,3 +19,4 @@ npx hardhat run scripts/deploy.ts
 https://github.com/Dkey111/BSC-Universal-dividend-token
 
 https://www.youtube.com/watch?v=trql3DDUb4Q
+https://bscscan.com/token/0x2ca6fe115b7a12bcb3791887a7f701daa54c3cc2
