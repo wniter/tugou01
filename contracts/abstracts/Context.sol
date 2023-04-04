@@ -19,10 +19,11 @@ abstract contract Context {
 
 
     // msg.data (bytes):完整的calldata  msg.sender (address):消息的发送方(调用者)
+    //内部函数_msgSender，获取函数调用者地址
     function _msgSender() internal view virtual returns (address) {
         return msg.sender;
     }
-
+    //内部函数，获取调用者的data
     function _msgData() internal view virtual returns (bytes calldata) {
         return msg.data;
     }

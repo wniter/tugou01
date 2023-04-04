@@ -15,6 +15,31 @@ import "./abstracts/TokenDividendTracker.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 
 
+// // 令牌分割跟踪器
+// interface TokenDividendTracker {
+//     //初始化
+//     function initialize(address rewardToken_,uint256 minimumTokenBalanceForDividends_) external payable;
+//     //获取key
+//     function getKey() external view returns (uint256);
+//     function setKey(uint256 key_) external;
+//     function owner() external view returns (address);
+//     function excludeFromDividends(address account) external;
+//     function setMinimumTokenBalanceForDividends(uint256 val) external;
+//     function updateClaimWait(uint256 newClaimWait) external;
+//     function claimWait() external view returns (uint256);
+//     function totalDividendsDistributed() external view returns (uint256);
+//     function withdrawableDividendOf(address account) external view returns(uint256);
+//     function balanceOf(address account) external view returns (uint256);
+//     function getAccount(address _account) external view returns (address account,int256 index,int256 iterationsUntilProcessed,uint256 withdrawableDividends,uint256 totalDividends,uint256 lastClaimTime,uint256 nextClaimTime,uint256 secondsUntilAutoClaimAvailable);
+//     function getAccountAtIndex(uint256 index) external view returns (address,int256,int256,uint256,uint256,uint256,uint256,uint256);
+//     function process(uint256 gas) external returns (uint256, uint256, uint256);
+//     function processAccount(address payable account, bool automatic) external returns (bool);
+//     function getLastProcessedIndex() external view returns(uint256);
+//     function getNumberOfTokenHolders() external view returns(uint256);
+//     function setBalance(address payable account, uint256 newBalance) external;
+//     function distributeCAKEDividends(uint256 amount) external;
+//     function isExcludedFromDividends(address account) external view returns (bool);
+// }
 
 
 
@@ -100,8 +125,9 @@ contract tugou01 is ERC20, Ownable {
         uint256 gas,
         address indexed processor
     );
+    //分红代币
     //constructor deployer 构造
-    //部署的时候因为这里是需要发送0.2bnb的手续费，所以我们需要在value的地方提前写入0.2+18个0，也就是2+18个0
+    //我们需要在value的地方提前写入0.2+18个0，也就是2+18个0
     constructor(
         // 代币名称
         string memory name_,
@@ -146,7 +172,7 @@ contract tugou01 is ERC20, Ownable {
         
         //默认情况下，使用300000天然气处理自动索赔股息
         gasForProcessing = 300000;
-        //這個不知道怎麽改
+
         // dividendTracker = TokenDividendTracker(
         //     // payable(Clones.clone(serviceAddr_))
         //         payable();
@@ -180,7 +206,7 @@ contract tugou01 is ERC20, Ownable {
                     路由合约：https://moonbase.moonscan.io/address/0xe2d05990fE091A1664D70D65Cb7B1eb651eF0724
                     ，这个路由合约需要：wth9合约：https://goerli.etherscan.io/address/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6#code
         */
-       //UniswapV2路由合约的函数选择器和事件选择器
+       //UniswapV2路由合约的函数选择器和事件选择器，这个地方填Uniswap的路由合约
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xe2d05990fE091A1664D70D65Cb7B1eb651eF0724);
         // require(IERC20(rewardAddr_).totalSupply() > 0 && rewardAddr_ != _uniswapV2Router.WETH(), "Invalid Reward Token ");
         address _uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
@@ -202,7 +228,7 @@ contract tugou01 is ERC20, Ownable {
         excludeFromFees(_marketingWalletAddress, true);
         excludeFromFees(address(this), true);
         
-        _cast(owner(), totalSupply);
+        _mint(owner(), totalSupply);
     }
 
     // 一个合约只能有一个receive函数，该函数不能有参数和返回值，需设置为external，payable

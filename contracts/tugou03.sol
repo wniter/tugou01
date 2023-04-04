@@ -1211,7 +1211,7 @@ contract TokenDividendTracker is Ownable, DividendPayingToken {
     }
 }
 
-
+// 分红合约，要测试
 contract tugou03 is ERC20, Ownable {
     using SafeMath for uint256;
 

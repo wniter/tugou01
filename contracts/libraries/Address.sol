@@ -3,14 +3,15 @@
 
 pragma solidity ^0.8.1;
 
-/***
-    https://github.com/OpenZeppelin/openzeppelin-contracts/edit/master/contracts/utils/Address.sol
- */
+
 /**
  * @dev Collection of functions related to the address type
  */
 library Address {
     /**
+     *    
+     * 判断是否是合约地址
+     *
      * @dev Returns true if `account` is a contract.
      *
      * [IMPORTANT]
