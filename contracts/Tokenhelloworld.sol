@@ -1,6 +1,6 @@
 pragma solidity ^0.5.10;
 
-contract Token {
+contract Tokenhelloworld {
     // 一个 `address` 类比于邮件地址 - 它用来识别以太坊的一个帐户。
     // 地址可以代表一个智能合约或一个外部（用户）帐户。
     // 了解更多：https://solidity.readthedocs.io/en/v0.5.10/types.html#address
