@@ -701,6 +701,8 @@ contract BIFI is ERC20, ERC20Detailed {
 /**
  * 
  * 发布的token ,治理代币
+ * 1.治理代币，功能：只有一个部署合约钱包权限，可以转移到其他钱包，代币可以增发。
+ * 2.参考代码：beefy，anyswap
  */
 contract tugou00 is ERC20, ERC20Detailed {
 
