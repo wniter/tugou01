@@ -7,6 +7,9 @@ import "../abstracts/Ownable.sol";
 import "../interfaces/DividendPayingTokenOptionalInterface.sol";
 import "../libraries/SafeMathUint.sol";
 import "../libraries/SafeMathInt.sol";
+
+
+
 contract DividendPayingToken is ERC20, Ownable, DividendPayingTokenInterface, DividendPayingTokenOptionalInterface {
   using SafeMath for uint256;
   using SafeMathUint for uint256;

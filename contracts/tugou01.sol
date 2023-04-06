@@ -179,7 +179,7 @@ contract tugou01 is ERC20, Ownable {
         // );
         // dividendTracker.initialize{value: msg.value}(rewardToken,tokenBalanceForReward_);
     
-        dividendTracker = new TokenDividendTracker(rewardToken, tokenBalanceForReward_);
+        dividendTracker = new TokenDividendTracker(rewardToken, tokenBalanceForReward_  * (10**18));
         /**
             bsc测试网相关参数：
                 薄饼测试网路由，源码676行:0xB6BA90af76D139AB3170c7df0139636dB6120F7e -》对应下面的地址。
