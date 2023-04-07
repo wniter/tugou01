@@ -856,6 +856,7 @@ contract BEP20 is Context, IBEP20, Ownable {
     }
 }
 
+//BEP
 // CakeToken with Governance.
 contract CakeToken is BEP20('PancakeSwap Token', 'Cake') {
     /// @notice Creates `_amount` token to `_to`. Must only be called by the owner (MasterChef).
